@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { ApiResponse } from "./utils/api-response.js";
+import healthCheckrouter from "./routes/healthcheck.routes.js";
 
 const app = express();
 
@@ -17,8 +17,6 @@ app.use(
     }),
 );
 
-app.get("/", (req, res) => {
-    res.send(new ApiResponse("Hello World!"));
-});
+app.use("/api/healthcheck", healthCheckrouter);
 
 export default app;
