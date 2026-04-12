@@ -49,13 +49,13 @@ const sendEmail = async (options) => {
     };
 
     const mailGenerator = new Mailgen(mailGeneratorOptions);
-    const emailBodyText = mailGenerator.generatePlaintext(options.contents);
-    const emailBodyHtml = mailGenerator.generate(options.contents);
+    const emailBodyText = mailGenerator.generatePlaintext(options.content);
+    const emailBodyHtml = mailGenerator.generate(options.content);
 
     const transporterOptions = {
         host: process.env.MAILTRAP_SMTP_HOST,
         port: process.env.MAILTRAP_SMTP_PORT,
-        secure: true,
+        secure: false,
         auth: {
             user: process.env.MAILTRAP_SMTP_USER,
             pass: process.env.MAILTRAP_SMTP_PASS,

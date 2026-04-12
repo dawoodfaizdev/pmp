@@ -46,6 +46,10 @@ const userSchema = new Schema(
             type: Boolean,
             default: false,
         },
+        emailVerifiedAt: {
+            type: Date,
+            default: null,
+        },
         emailVerificationToken: {
             type: String,
         },
@@ -65,12 +69,10 @@ const userSchema = new Schema(
     { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
 
     this.password = await bcrypt.hash(this.password, 10);
-
-    next();
 });
 
 userSchema.methods.isPasswordMatch = async function (enteredPassword) {
@@ -84,7 +86,7 @@ userSchema.methods.generateAccessToken = function () {
             username: this.username,
             email: this.email,
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_ACCESS_TOKEN_SECRET,
         {
             expiresIn: process.env.JWT_ACCESS_TOKEN_EXPIRATION,
         },
@@ -96,7 +98,7 @@ userSchema.methods.generateRefreshToken = function () {
         {
             _id: this._id,
         },
-        process.env.JWT_SECRET,
+        process.env.JWT_REFRESH_TOKEN_SECRET,
         {
             expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION,
         },
@@ -107,7 +109,7 @@ userSchema.methods.generateTemporaryToken = function () {
     const unhashedToken = crypto.randomBytes(32).toString("hex");
 
     const hashedToken = crypto
-        .createHash("sha256", process.env.TEMPORARY_TOKEN_SECRET)
+        .createHmac("sha256", process.env.TEMPORARY_TOKEN_SECRET)
         .update(unhashedToken)
         .digest("hex");
 
@@ -120,4 +122,4 @@ userSchema.methods.generateTemporaryToken = function () {
     };
 };
 
-export const user = mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
